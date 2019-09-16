@@ -2,8 +2,6 @@ package br.com.demospringboot.controller;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.net.ssl.HttpsURLConnection;
 import javax.validation.Valid;
 
 import org.springframework.http.HttpStatus;
@@ -17,30 +15,41 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-
 import br.com.demospringboot.dto.ResponseData;
+import br.com.demospringboot.entity.Estudante;
 import br.com.demospringboot.exception.ExceptionDefault;
-import br.com.demospringboot.model.Estudante;
+import br.com.demospringboot.repository.EstudanteRepository;
 
 @RestController
 @ResponseBody
 @RequestMapping("/api/v1/estudantes")
 public class EstudanteController {
+	
+	private EstudanteRepository repository;
 
 	private List<Estudante> listaEstudantes = new ArrayList();
 	
+	public EstudanteController(EstudanteRepository _repository) {
+		this.repository = _repository;
+	}
+	
+	
 	
 	@GetMapping("/listar")
-	public ResponseEntity<?> Listar()
+	public ResponseEntity<?> ListarTodos()
 	{	
-		return new ResponseEntity<>(new ResponseData(listaEstudantes), HttpStatus.OK);
+		List<Estudante> estudantes = repository.findAll();		
+		return new ResponseEntity<>(new ResponseData(estudantes), HttpStatus.OK);
 	}
 	
 	
 	@GetMapping("/listar/{id}")
-	public ResponseEntity<?> ListarPorId(@PathVariable("id") Integer id )
+	public ResponseEntity<?> ListarPorId(@PathVariable("id") Long id )
 	{	
-		Estudante estudante = listaEstudantes.get(1);
+		Estudante estudante = repository.getOne(id);
+		if(estudante == null) {
+			return new ResponseEntity<>(new ResponseData(new ExceptionDefault(HttpStatus.BAD_REQUEST.toString() , "O estudante informado não foi encontrado.")), HttpStatus.BAD_REQUEST);
+		}
 		return new ResponseEntity<>(new ResponseData(estudante), HttpStatus.OK);
 	}
 	
@@ -48,42 +57,35 @@ public class EstudanteController {
 	@PostMapping("/adicionar")
 	public ResponseEntity<?> Adicionar(@RequestBody @Valid Estudante request)
 	{		
-		listaEstudantes.add(request);		
-		return new ResponseEntity<>(new ResponseData(request), HttpStatus.CREATED);
+		Estudante estudante = repository.save(request);
+		return new ResponseEntity<>(new ResponseData(estudante), HttpStatus.CREATED);
 	}
 	
 	
 	@DeleteMapping("/remover/{id}")
-	public ResponseEntity<?> Remover(@PathVariable("id") Integer id)
+	public ResponseEntity<?> Remover(@PathVariable("id") Long id)
 	{	
 		try {
-			Integer retorno = listaEstudantes.indexOf(id);			
-			if(retorno == -1) {
-				return new ResponseEntity<>(new ResponseData(new ExceptionDefault(HttpStatus.NOT_FOUND.toString() , "O estudante informado não foi encontrado.")), HttpStatus.NOT_FOUND);
+			Estudante estudante = repository.getOne(id);			
+			if(estudante == null) {
+				return new ResponseEntity<>(new ResponseData(new ExceptionDefault(HttpStatus.BAD_REQUEST.toString() , "Estudante não encontrado.")), HttpStatus.BAD_REQUEST);
 			}
+			repository.delete(estudante);
 		}catch(Exception ex) {
-			return new ResponseEntity<>(new ResponseData(new ExceptionDefault(HttpStatus.NOT_FOUND.toString() , "O estudante informado não foi encontrado.")), HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(new ResponseData(new ExceptionDefault(HttpStatus.BAD_REQUEST.toString() , "Ocorreu um erro ao excluir o estudante.")), HttpStatus.BAD_REQUEST);
 		}
 		return new ResponseEntity(HttpStatus.OK);
 	}
 	
 	
-	@PutMapping("/atualizar/{id}")
-	public ResponseEntity<?> Atualizar(@PathVariable("id") Integer id, @RequestBody @Valid Estudante request)
+	@PutMapping("/atualizar/")
+	public ResponseEntity<?> Atualizar(@RequestBody @Valid Estudante request)
 	{	
 		try {
-			Integer retorno = listaEstudantes.indexOf(id);			
-			if(retorno == -1) {
-				return new ResponseEntity<>(new ResponseData(new ExceptionDefault(HttpStatus.NOT_FOUND.toString() , "O estudante informado não foi encontrado.")), HttpStatus.NOT_FOUND);
-			}else {
-				listaEstudantes.remove(retorno);
-			}
-			
-			listaEstudantes.add(request);			
-			return new ResponseEntity<>(new ResponseData(request), HttpStatus.OK);
-			
+			Estudante estudante = repository.saveAndFlush(request);	
+			return new ResponseEntity<>(new ResponseData(estudante), HttpStatus.OK);			
 		}catch(Exception ex) {
-			return new ResponseEntity<>(new ResponseData(new ExceptionDefault(HttpStatus.NOT_FOUND.toString() , "Ocorreu uma falha. Não foi possível atualizar o estudante. Tente novamente mais tarde.")), HttpStatus.NOT_FOUND);			
+			return new ResponseEntity<>(new ResponseData(new ExceptionDefault(HttpStatus.BAD_REQUEST.toString() , "Não foi possível atualizar o estudante. Tente novamente mais tarde.")), HttpStatus.BAD_REQUEST);			
 		}
 	}
 }

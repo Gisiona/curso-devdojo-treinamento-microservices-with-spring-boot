@@ -1,17 +1,17 @@
 package br.com.demospringboot.model;
 
-public class Estudante {
+public class EstudanteModel {
 
 	private Long Id;
 	private String Nome;
 	private String Email;
 	private String Telefone;
 	
-	public Estudante() {
+	public EstudanteModel() {
 		
 	}
 	
-	public Estudante(Long id, String nome, String email, String telefone) {
+	public EstudanteModel(Long id, String nome, String email, String telefone) {
 		this.Id = id;
 		this.Nome = nome;
 		this.Email = email;
