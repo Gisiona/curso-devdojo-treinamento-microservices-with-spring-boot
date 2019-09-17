@@ -11,12 +11,7 @@ import lombok.Setter;
 @Setter 
 @MappedSuperclass /* nao permite que esta entidade seja criada no banco de dados */
 public class EntityAbstractBase implements Serializable {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	@SuppressWarnings("unused")
-	
+
 	private Long id;
 	@Override
 	public int hashCode() {
