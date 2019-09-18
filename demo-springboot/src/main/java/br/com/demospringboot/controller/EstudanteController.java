@@ -2,15 +2,14 @@ package br.com.demospringboot.controller;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.unit.DataUnit;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,11 +19,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
 import br.com.demospringboot.dto.ResponseData;
 import br.com.demospringboot.exception.ExceptionDefault;
 import br.com.demospringboot.model.EstudanteModel;
 import br.com.demospringboot.repository.EstudanteRepository;
 import br.com.demospringboot.util.DateUtils;
+import br.com.demospringboot.validation.EstudanteValidation;
 
 @RestController
 @ResponseBody
@@ -32,15 +33,13 @@ import br.com.demospringboot.util.DateUtils;
 public class EstudanteController {
 	
 	private EstudanteRepository repository;
-
-	private List<EstudanteModel> listaEstudantes = new ArrayList();
 	
 	@Autowired
 	public EstudanteController(EstudanteRepository _repository) {
 		this.repository = _repository;
 	}
 	
-	@GetMapping("/date")
+	@GetMapping("/teste")
 	public ResponseEntity<?> TesteConvertDate()
 	{	
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -63,12 +62,29 @@ public class EstudanteController {
 	}
 	
 	
+	@GetMapping("/listar/{nome}")
+	public ResponseEntity<?> ListarPorNome(@PathVariable String nome)
+	{	
+		List<EstudanteModel> estudantes = repository.findByNomeIgnoreCaseContaining(nome);	
+		if(!EstudanteValidation.validaIfEstudanteExiste(estudantes.get(0))) {
+			return new ResponseEntity<>(new ResponseData(
+					new ExceptionDefault(HttpStatus.BAD_REQUEST.toString(), 
+							"Estudante não encontrado.")), 
+					HttpStatus.BAD_REQUEST);
+		}
+		return new ResponseEntity<>(new ResponseData(estudantes), HttpStatus.OK);
+	}
+	
+	
 	@GetMapping("/listar/{id}")
 	public ResponseEntity<?> ListarPorId(@PathVariable("id") Long id )
 	{	
 		EstudanteModel estudante = repository.getOne(id);
-		if(estudante == null) {
-			return new ResponseEntity<>(new ResponseData(new ExceptionDefault(HttpStatus.BAD_REQUEST.toString() , "O estudante informado não foi encontrado.")), HttpStatus.BAD_REQUEST);
+		if(!EstudanteValidation.validaIfEstudanteExiste(estudante)) {
+			return new ResponseEntity<>(new ResponseData(
+					new ExceptionDefault(HttpStatus.BAD_REQUEST.toString() , 
+							"O estudante informado não foi encontrado.")), 
+					HttpStatus.BAD_REQUEST);
 		}
 		return new ResponseEntity<>(new ResponseData(estudante), HttpStatus.OK);
 	}
@@ -87,12 +103,18 @@ public class EstudanteController {
 	{	
 		try {
 			EstudanteModel estudante= repository.getOne(id);			
-			if(estudante == null) {
-				return new ResponseEntity<>(new ResponseData(new ExceptionDefault(HttpStatus.BAD_REQUEST.toString() , "Estudante não encontrado.")), HttpStatus.BAD_REQUEST);
+			if(!EstudanteValidation.validaIfEstudanteExiste(estudante)) {
+				return new ResponseEntity<>(new ResponseData(
+						new ExceptionDefault(HttpStatus.BAD_REQUEST.toString() , 
+								"Estudante não encontrado.")), 
+						HttpStatus.BAD_REQUEST);
 			}
 			repository.delete(estudante);
 		}catch(Exception ex) {
-			return new ResponseEntity<>(new ResponseData(new ExceptionDefault(HttpStatus.BAD_REQUEST.toString() , "Ocorreu um erro ao excluir o estudante.")), HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(new ResponseData(
+					new ExceptionDefault(HttpStatus.BAD_REQUEST.toString() , 
+							"Ocorreu um erro ao excluir o estudante.")), 
+					HttpStatus.BAD_REQUEST);
 		}
 		return new ResponseEntity(HttpStatus.OK);
 	}
@@ -105,7 +127,10 @@ public class EstudanteController {
 			EstudanteModel estudante = repository.saveAndFlush(request);	
 			return new ResponseEntity<>(new ResponseData(estudante), HttpStatus.OK);			
 		}catch(Exception ex) {
-			return new ResponseEntity<>(new ResponseData(new ExceptionDefault(HttpStatus.BAD_REQUEST.toString() , "Não foi possível atualizar o estudante. Tente novamente mais tarde.")), HttpStatus.BAD_REQUEST);			
+			return new ResponseEntity<>(new ResponseData(
+					new ExceptionDefault(HttpStatus.BAD_REQUEST.toString() , 
+							"Não foi possível atualizar o estudante. Tente novamente mais tarde.")), 
+					HttpStatus.BAD_REQUEST);			
 		}
 	}
 }
