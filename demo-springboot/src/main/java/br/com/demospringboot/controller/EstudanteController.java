@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.demospringboot.dto.ResponseData;
 import br.com.demospringboot.exception.ExceptionDefault;
+import br.com.demospringboot.exception.ResourceNotFoundException;
 import br.com.demospringboot.model.EstudanteModel;
 import br.com.demospringboot.repository.EstudanteRepository;
 import br.com.demospringboot.util.DateUtils;
@@ -67,10 +68,7 @@ public class EstudanteController {
 	{	
 		List<EstudanteModel> estudantes = repository.findByNomeIgnoreCaseContaining(nome);	
 		if(!EstudanteValidation.validaIfEstudanteExiste(estudantes.get(0))) {
-			return new ResponseEntity<>(new ResponseData(
-					new ExceptionDefault(HttpStatus.BAD_REQUEST.toString(), 
-							"Estudante não encontrado.")), 
-					HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(new ResponseData(new ResourceNotFoundException("Estudante não encontrado.")),HttpStatus.BAD_REQUEST);
 		}
 		return new ResponseEntity<>(new ResponseData(estudantes), HttpStatus.OK);
 	}
@@ -81,10 +79,7 @@ public class EstudanteController {
 	{	
 		EstudanteModel estudante = repository.getOne(id);
 		if(!EstudanteValidation.validaIfEstudanteExiste(estudante)) {
-			return new ResponseEntity<>(new ResponseData(
-					new ExceptionDefault(HttpStatus.BAD_REQUEST.toString() , 
-							"O estudante informado não foi encontrado.")), 
-					HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(new ResponseData(new ResourceNotFoundException("Estudante não encontrado.")),HttpStatus.BAD_REQUEST);
 		}
 		return new ResponseEntity<>(new ResponseData(estudante), HttpStatus.OK);
 	}
@@ -104,17 +99,11 @@ public class EstudanteController {
 		try {
 			EstudanteModel estudante= repository.getOne(id);			
 			if(!EstudanteValidation.validaIfEstudanteExiste(estudante)) {
-				return new ResponseEntity<>(new ResponseData(
-						new ExceptionDefault(HttpStatus.BAD_REQUEST.toString() , 
-								"Estudante não encontrado.")), 
-						HttpStatus.BAD_REQUEST);
+				return new ResponseEntity<>(new ResponseData(new ResourceNotFoundException("Estudante não encontrado.")),HttpStatus.BAD_REQUEST);
 			}
 			repository.delete(estudante);
 		}catch(Exception ex) {
-			return new ResponseEntity<>(new ResponseData(
-					new ExceptionDefault(HttpStatus.BAD_REQUEST.toString() , 
-							"Ocorreu um erro ao excluir o estudante.")), 
-					HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(new ResponseData(new ResourceNotFoundException("Estudante não encontrado.")),HttpStatus.BAD_REQUEST);
 		}
 		return new ResponseEntity(HttpStatus.OK);
 	}
@@ -127,10 +116,7 @@ public class EstudanteController {
 			EstudanteModel estudante = repository.saveAndFlush(request);	
 			return new ResponseEntity<>(new ResponseData(estudante), HttpStatus.OK);			
 		}catch(Exception ex) {
-			return new ResponseEntity<>(new ResponseData(
-					new ExceptionDefault(HttpStatus.BAD_REQUEST.toString() , 
-							"Não foi possível atualizar o estudante. Tente novamente mais tarde.")), 
-					HttpStatus.BAD_REQUEST);			
+			return new ResponseEntity<>(new ResponseData(new ResourceNotFoundException("Estudante não encontrado.")),HttpStatus.BAD_REQUEST);			
 		}
 	}
 }
