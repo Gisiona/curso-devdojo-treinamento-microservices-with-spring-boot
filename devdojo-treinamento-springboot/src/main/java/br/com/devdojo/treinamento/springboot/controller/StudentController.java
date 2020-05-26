@@ -2,6 +2,8 @@ package br.com.devdojo.treinamento.springboot.controller;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,7 +39,7 @@ public class StudentController {
 	}
 	
 	@PostMapping()
-	public ResponseEntity<?> saveStudent(@RequestBody StudentModel sts){
+	public ResponseEntity<?> saveStudent(@RequestBody @Valid	 StudentModel sts){
 		StudentModel model = studentProcessor.save(sts);
 		return new ResponseEntity<>(model, HttpStatus.CREATED); 
 	}

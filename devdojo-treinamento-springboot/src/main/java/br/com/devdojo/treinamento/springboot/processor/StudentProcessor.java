@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import br.com.devdojo.treinamento.springboot.entity.Student;
+import br.com.devdojo.treinamento.springboot.exception.ResourceNotFounfException;
 import br.com.devdojo.treinamento.springboot.model.StudentModel;
 import br.com.devdojo.treinamento.springboot.repository.StudentRepository;
 import javassist.NotFoundException;
@@ -41,7 +42,7 @@ public class StudentProcessor{
 			studentUpdate = studentRepository.saveAndFlush(studentUpdate);		
 			return StudentModel.mapperConverter(studentUpdate);
 		}
-		throw new NotFoundException("Student não localizado.");		
+		throw new ResourceNotFounfException("Student não localizado.");		
 	}
 
 	public void delete(Long id) throws NotFoundException {
@@ -49,7 +50,7 @@ public class StudentProcessor{
 		if(student.isPresent()) {
 			studentRepository.delete(student.get());
 		}else {
-			throw new NotFoundException("Student não localizado.");
+			throw new ResourceNotFounfException("Student não localizado.");
 		}		
 	}
 }

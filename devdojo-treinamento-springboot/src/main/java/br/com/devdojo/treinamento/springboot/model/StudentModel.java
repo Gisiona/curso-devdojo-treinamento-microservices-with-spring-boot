@@ -3,11 +3,21 @@ package br.com.devdojo.treinamento.springboot.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
+
 import br.com.devdojo.treinamento.springboot.entity.Student;
 
 public class StudentModel {
 
 	private Long id;
+	@NotEmpty(message = "O campo nome não pode ser nulo.")	
+	private String nome;
+	
+	@Email(message = "Digite um e-mail válido.")
+	@NotEmpty(message = "O campo e-mail não pode ser nulo.")
+	private String email;
+	
 	public Long getId() {
 		return id;
 	}
@@ -15,8 +25,6 @@ public class StudentModel {
 	public void setId(Long id) {
 		this.id = id;
 	}
-
-	private String nome;
 
 	public String getNome() {
 		return nome;
