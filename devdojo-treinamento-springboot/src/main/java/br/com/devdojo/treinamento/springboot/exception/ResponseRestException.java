@@ -2,9 +2,13 @@ package br.com.devdojo.treinamento.springboot.exception;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class ResponseRestException {
 
 	private int status;
+	
+	@JsonProperty("error")
 	private String mensagem;
 	private Long tamestamp;
 	private LocalDateTime datetime;

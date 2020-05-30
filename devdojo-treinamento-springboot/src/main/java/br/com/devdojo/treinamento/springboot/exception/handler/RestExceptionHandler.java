@@ -16,13 +16,15 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import br.com.devdojo.treinamento.springboot.exception.PaginationValidationException;
 import br.com.devdojo.treinamento.springboot.exception.ResourceNotFounfException;
 import br.com.devdojo.treinamento.springboot.exception.ResponseRestException;
 import br.com.devdojo.treinamento.springboot.exception.ValidationFieldException;
 
 @Controller
 @ControllerAdvice
-public class RestExceptionHandler {
+public class RestExceptionHandler{
+	// ResponseEntityExceptionHandler
 
 	@Autowired
 	private MessageSource messageSource;
@@ -50,6 +52,15 @@ public class RestExceptionHandler {
 			response.add(objErro);
 		});
 		
+		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(PaginationValidationException.class)
+	public ResponseEntity<?> handlerPaginationValidationException(PaginationValidationException ex){
+		ResponseRestException response = new ResponseRestException(HttpStatus.BAD_REQUEST.value(), 
+																	ex.getMensagem(), 
+																	new Date().getTime(), 
+																	LocalDateTime.now());
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 }

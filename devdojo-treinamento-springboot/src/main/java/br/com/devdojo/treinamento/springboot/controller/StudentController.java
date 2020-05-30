@@ -1,10 +1,9 @@
 package br.com.devdojo.treinamento.springboot.controller;
 
-import java.util.List;
-
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,9 +26,10 @@ public class StudentController {
 	@Autowired
 	private StudentProcessor studentProcessor;
 	
+	
 	@GetMapping()
-	public List<StudentModel> listAll(){		
-		return studentProcessor.getAll();
+	public ResponseEntity<?> listAll(Pageable page){		
+		return ResponseEntity.ok(studentProcessor.getAll(page));
 	}
 	
 	
