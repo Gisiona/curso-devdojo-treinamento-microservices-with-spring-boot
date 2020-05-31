@@ -1,15 +1,11 @@
 package br.com.devdojo.treinamento.springboot.exception;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+public class ResponseRestException extends DefaultDetalsException {
 
-public class ResponseRestException {
-
-	private int status;
-	
-	@JsonProperty("error")
-	private String mensagem;
+	private int status;	
 	private Long tamestamp;
 	private LocalDateTime datetime;
 	
@@ -23,20 +19,23 @@ public class ResponseRestException {
 	}
 
 
-	public String getMensagem() {
-		return mensagem;
-	}
-
-
 	public Long getTamestamp() {
 		return tamestamp;
 	}	
 	
-	public ResponseRestException(int status, String mensagem, Long tamestamp, LocalDateTime date) {
-		super();
+	public ResponseRestException(int status, String mensagem, Long tamestamp) {
+		super(mensagem);
 		this.status = status;
-		this.mensagem = mensagem;
 		this.tamestamp = tamestamp;
-		this.datetime = date;
+		this.datetime = LocalDateTime.now();
 	}
+	
+	public ResponseRestException(int status, String mensagem) {
+		super(mensagem);
+		this.status = status;
+		this.tamestamp = new Date().getTime();
+		this.datetime = LocalDateTime.now();
+	}
+
+	
 }

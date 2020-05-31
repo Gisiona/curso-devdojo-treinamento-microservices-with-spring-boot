@@ -1,8 +1,6 @@
 package br.com.devdojo.treinamento.springboot.exception.handler;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,9 +31,7 @@ public class RestExceptionHandler{
 	public ResponseEntity<?> handlerNotFoundException(ResourceNotFounfException exc){
 		ResponseRestException response = 
 				new ResponseRestException(HttpStatus.NOT_FOUND.value(), 
-										exc.getMensagem(), 
-										new Date().getTime(), 
-										LocalDateTime.now());
+										exc.getMensagem());
 		
 		return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
 	}
@@ -58,9 +54,14 @@ public class RestExceptionHandler{
 	@ExceptionHandler(PaginationValidationException.class)
 	public ResponseEntity<?> handlerPaginationValidationException(PaginationValidationException ex){
 		ResponseRestException response = new ResponseRestException(HttpStatus.BAD_REQUEST.value(), 
-																	ex.getMensagem(), 
-																	new Date().getTime(), 
-																	LocalDateTime.now());
+																	ex.getMensagem());
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<?> handlerException(Exception ex){
+		ResponseRestException response = new ResponseRestException(HttpStatus.INTERNAL_SERVER_ERROR.value(), 
+																	ex.getMessage());
+		return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 }
